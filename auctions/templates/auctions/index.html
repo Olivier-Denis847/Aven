@@ -3,5 +3,24 @@
 {% block body %}
     <h2>Active Listings</h2>
 
-    TODO
+    {% if empty %}
+        <br><h3>No listings yet.</h3>
+    {% endif %}
+    {% for l in listings %}
+        <div><table>
+            <tr>
+                <td rowspan="4"><img src="{{l.image}}"></td>
+                <td><h5>{{l.name}}</h5></td>
+            </tr>
+            <tr>
+                <td>Price: ${{l.price}}</td>
+            </tr>
+            <tr>
+                <td>{{l.description}}</td>
+            </tr>
+            <tr>
+                <td>{{l.date}}</td>
+            </tr>
+        </div></table>
+    {% endfor %}
 {% endblock %}

@@ -1,24 +1,31 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
 from django import forms
 
 import datetime
 from .models import *
 
+CATEGORIES = ['Food', 'Toys', 'Fitness', 'Productivity', 'Electronics',
+              'Clothing', 'Music', 'Decoration', 'Misc']
 
 class Create_listing(forms.Form):
     name = forms.CharField()
     description = forms.CharField(widget=forms.Textarea)
     starting_bid = forms.FloatField()
     image_url = forms.CharField()
-    category = forms.CharField()
+
+    category_list = tuple((i,c) for i,c in enumerate(CATEGORIES))
+    category = forms.ChoiceField(choices=category_list)
     
     
 def index(request):
-    return render(request, "auctions/index.html")
+    items = Listing.objects.all()
+    return render(request, "auctions/index.html", {
+        'listings': items, 'empty': len(items)==0
+    })
 
 
 def login_view(request):
@@ -87,13 +94,12 @@ def create_form(request):
             description = form.cleaned_data['description']
             img = form.cleaned_data['image_url']
             price = form.cleaned_data['starting_bid']
-            category = form.cleaned_data['category']
+            category = CATEGORIES[int(form.cleaned_data['category'])]
 
             new_listing = Listing(
                 name = name, image = img, price = price, description = description,
-                category = category, date=datetime.datetime)
-            print(new_listing)
+                category = category, date =  datetime.datetime.now())
             new_listing.save()
 
-    return redirect('index.html')
+    return HttpResponseRedirect(reverse("index"))
     

@@ -11,5 +11,5 @@ class Listing(models.Model):
     image = models.CharField()
     price = models.FloatField()
     description = models.CharField(max_length=500)
-    date = models.DateTimeField(default=datetime.timezone)
-    category = models.CharField(max_length=100)
+    date = models.DateTimeField()
+    category = models.CharField()
