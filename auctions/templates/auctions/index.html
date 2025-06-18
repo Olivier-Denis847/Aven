@@ -1,26 +1,30 @@
 {% extends "auctions/layout.html" %}
+{% load tz %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h2 style="margin-left: 0.5%;">Active Listings</h2>
 
     {% if empty %}
         <br><h3>No listings yet.</h3>
     {% endif %}
     {% for l in listings %}
-        <div><table>
+        <div><table class="listing">
             <tr>
-                <td rowspan="4"><img src="{{l.image}}"></td>
-                <td><h5>{{l.name}}</h5></td>
+                <td rowspan="5" class="half_list">
+                    <img src="{{l.image}}">
+                </td>
+                <td id="top_row"><h3>{{l.name}}</h3></td>
             </tr>
             <tr>
-                <td>Price: ${{l.price}}</td>
+                <td>Price: ${{l.highest_bid.amount}}</td>
             </tr>
             <tr>
                 <td>{{l.description}}</td>
             </tr>
             <tr>
-                <td>{{l.date}}</td>
+                <td>{% localtime on %}{{l.date}}{% endlocaltime %}</td>
             </tr>
-        </div></table>
+            <tr><td></td></tr>
+        </table></div>
     {% endfor %}
 {% endblock %}

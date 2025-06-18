@@ -1,3 +1,24 @@
 body {
     padding: 10px;
 }
+
+.listing{
+    border: 1px solid lightgrey;
+    margin-bottom: 2%;
+    width: 99%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.half_list img{
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+}
+.half_list{
+    padding: 5%;
+    padding-right: 10%;
+    width: 40%;
+}
+#top_row{
+    padding-top: 4%;
+}

@@ -4,12 +4,24 @@ import datetime
 
 
 class User(AbstractUser):
-    pass
+    username = models.CharField(max_length=100, unique=True, primary_key=True)
+    email = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
 
 class Listing(models.Model):
     name = models.CharField(max_length=100)
     image = models.CharField()
-    price = models.FloatField()
     description = models.CharField(max_length=500)
     date = models.DateTimeField()
     category = models.CharField()
+
+class Bid(models.Model):
+    amount = models.FloatField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='active_bids')
+    listing = models.OneToOneField(
+        Listing, on_delete=models.CASCADE, related_name='highest_bid')
+
+class Comment(models.Model):
+    content = models.CharField(max_length=500)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='comments')

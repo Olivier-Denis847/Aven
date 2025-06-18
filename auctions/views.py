@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -86,6 +87,7 @@ def creation_view(request):
         'listing': listing
     })
 
+@login_required()
 def create_form(request):
     if request.method == 'POST':
         form = Create_listing(request.POST)
@@ -97,9 +99,11 @@ def create_form(request):
             category = CATEGORIES[int(form.cleaned_data['category'])]
 
             new_listing = Listing(
-                name = name, image = img, price = price, description = description,
+                name = name, image = img, description = description,
                 category = category, date =  datetime.datetime.now())
             new_listing.save()
+            starting_bid = Bid(amount = price, user=request.user, listing=new_listing)
+            starting_bid.save()
 
     return HttpResponseRedirect(reverse("index"))
     
