@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django import forms
+from django.core.exceptions import ObjectDoesNotExist
 
 import datetime
 from .models import *
@@ -20,6 +21,12 @@ class Create_listing(forms.Form):
 
     category_list = tuple((i,c) for i,c in enumerate(CATEGORIES))
     category = forms.ChoiceField(choices=category_list)
+
+class Add_bid(forms.Form):
+    amount = forms.FloatField()
+
+class Add_comment(forms.Form):
+    content = forms.CharField(max_length=500)
     
     
 def index(request):
@@ -107,3 +114,16 @@ def create_form(request):
 
     return HttpResponseRedirect(reverse("index"))
     
+
+def listing_view(request, id):
+    #Assume get request, post goes to another view
+    try:
+        item = Listing.objects.get(id = id)
+    except ObjectDoesNotExist:
+        return HttpResponseRedirect(reverse("index"))
+    bid_form = Add_bid()
+    comment_form = Add_comment()
+    return render(request, 'auctions/listing.html',{
+        'listing':item, 'bid_form':bid_form, 'comment_form':comment_form
+    })
+

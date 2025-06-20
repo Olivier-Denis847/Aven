@@ -8,7 +8,7 @@
         <br><h3>No listings yet.</h3>
     {% endif %}
     {% for l in listings %}
-        <div><table class="listing">
+        <div><a href="{% url 'listing_view' id=l.id %}"><table class="listing">
             <tr>
                 <td rowspan="5" class="half_list">
                     <img src="{{l.image}}">
@@ -25,6 +25,6 @@
                 <td>{% localtime on %}{{l.date}}{% endlocaltime %}</td>
             </tr>
             <tr><td></td></tr>
-        </table></div>
+        </table></a></div>
     {% endfor %}
 {% endblock %}

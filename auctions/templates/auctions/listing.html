@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+
+{% block title%}{{listing.name}}{% endblock %}
+
+{% block body %}
+<table>
+    <tr><td>
+        <h2>{{listing.name}}</h2>
+    </td>
+    <td>
+        <form action="{% url 'listing_view%' id=listing.id'}">
+            {{csrf_token}}
+            {% if wishlist %}
+            <input id="on_wishlist" type="submit" name="wishlist">
+            {% else %}
+            <input id="no_wishlist" type="submit" name="wishlist">
+        </form>
+    </td>
+    <p>
+        <div>
+            {{listing.category}}
+        </div>
+        Posted: {{listing.date}}
+    </p>
+</table>
+<img src="{{listing.image}}">
+<p>{{listing.description}}</p>
+<p>${{listing.highest_bid.amount}}</p>
+{% endblock %}
