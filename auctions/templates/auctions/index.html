@@ -2,10 +2,16 @@
 {% load tz %}
 
 {% block body %}
+    {% if home %}
     <h2 style="margin-left: 0.5%;">Active Listings</h2>
-
     {% if empty %}
         <br><h3>No listings yet.</h3>
+    {% endif %}
+    {% else %}
+    <h2 style="margin-left: 0.5%;">Wishlist</h2>
+    {% if empty %}
+        <br><h3>Your wishlist is empty.</h3>
+    {% endif %}
     {% endif %}
     {% for l in listings %}
         <div><a href="{% url 'listing_view' id=l.id %}"><table class="listing">

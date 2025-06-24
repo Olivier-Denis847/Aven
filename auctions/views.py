@@ -32,9 +32,15 @@ class Add_comment(forms.Form):
 def index(request):
     items = Listing.objects.all()
     return render(request, "auctions/index.html", {
-        'listings': items, 'empty': len(items)==0
+        'listings': items, 'empty': len(items)==0, 'home': True
     })
 
+@login_required
+def wishlisted(request):
+    items = request.user.wishlist.all()
+    return render(request, "auctions/index.html", {
+        'listings': items, 'empty': len(items)==0, 'home': False
+    })
 
 def login_view(request):
     if request.method == "POST":
@@ -94,7 +100,7 @@ def creation_view(request):
         'listing': listing
     })
 
-@login_required()
+@login_required
 def create_form(request):
     if request.method == 'POST':
         form = Create_listing(request.POST)
@@ -116,14 +122,33 @@ def create_form(request):
     
 
 def listing_view(request, id):
-    #Assume get request, post goes to another view
+    user = request.user
     try:
         item = Listing.objects.get(id = id)
     except ObjectDoesNotExist:
         return HttpResponseRedirect(reverse("index"))
+    
+    #3 different forms on the same view. Each has a different action 1 func for each
+    #Add to wishlist
+    if request.method == 'POST':
+        if user is None:
+            return HttpResponseRedirect(reverse('login_view'))
+        add = request.POST.get('wishlist')
+        if add == 'Add to wishlist':
+            user.wishlist.add(item) 
+        else:
+            user.wishlist.remove(item) 
+        user.save()
+
+    wishlist = False
+    in_user = user.wishlist.filter(id=id).count()
+    if in_user != 0:
+        wishlist = True
+
     bid_form = Add_bid()
     comment_form = Add_comment()
     return render(request, 'auctions/listing.html',{
-        'listing':item, 'bid_form':bid_form, 'comment_form':comment_form
+        'listing':item, 'bid_form':bid_form, 'comment_form':comment_form, 
+        'wishlist':wishlist
     })
 

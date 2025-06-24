@@ -25,6 +25,16 @@ a td{
     padding-right: 10%;
     width: 40%;
 }
+.listing_left_col{
+    padding-left: 5%;
+    width: 50%;
+}
 #top_row{
     padding-top: 4%;
+}
+#listing_main{
+    width: 50%;
+    height: auto;
+    display: block;
+    margin: auto;
 }

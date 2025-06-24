@@ -3,27 +3,41 @@
 {% block title%}{{listing.name}}{% endblock %}
 
 {% block body %}
-<table>
-    <tr><td>
+<table class="listing">
+    <tr>
+    <td class="listing_left_col">
         <h2>{{listing.name}}</h2>
     </td>
     <td>
-        <form action="{% url 'listing_view%' id=listing.id'}">
-            {{csrf_token}}
+        <form action="{% url 'listing_view' id=listing.id %}" method="post">
+            {% csrf_token %}
             {% if wishlist %}
-            <input id="on_wishlist" type="submit" name="wishlist">
+            <input id="on_wishlist" type="submit" name="wishlist" value="Remove from wishlist">
             {% else %}
-            <input id="no_wishlist" type="submit" name="wishlist">
+            <input id="no_wishlist" type="submit" name="wishlist" value="Add to wishlist">
+            {% endif %}
         </form>
     </td>
-    <p>
-        <div>
-            {{listing.category}}
-        </div>
-        Posted: {{listing.date}}
-    </p>
+    </tr>
+    <tr>
+    <td class="listing_left_col">
+        <p>Posted: {{listing.date}}</p>
+    </td>
+    <td>
+        <p>{{listing.category}}</p>
+    </td>
+    </tr>
+    <tr><td colspan="2">
+        <hr>
+        <img src="{{listing.image}}" id="listing_main">
+    </td></tr>
+    <tr><td colspan="2">
+        <p>{{listing.description}}</p>
+    </td></tr>
+    <tr>
+    <td colspan="2">
+        <p>${{listing.highest_bid.amount}}</p>
+    </td>
+    </tr>
 </table>
-<img src="{{listing.image}}">
-<p>{{listing.description}}</p>
-<p>${{listing.highest_bid.amount}}</p>
 {% endblock %}

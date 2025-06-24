@@ -3,17 +3,18 @@ from django.db import models
 import datetime
 
 
-class User(AbstractUser):
-    username = models.CharField(max_length=100, unique=True, primary_key=True)
-    email = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)
-
 class Listing(models.Model):
     name = models.CharField(max_length=100)
     image = models.CharField()
     description = models.CharField(max_length=500)
     date = models.DateTimeField()
     category = models.CharField()
+
+class User(AbstractUser):
+    username = models.CharField(max_length=100, unique=True, primary_key=True)
+    email = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+    wishlist = models.ManyToManyField(Listing)
 
 class Bid(models.Model):
     amount = models.FloatField()
