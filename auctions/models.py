@@ -7,7 +7,7 @@ class Listing(models.Model):
     name = models.CharField(max_length=100)
     image = models.CharField()
     description = models.CharField(max_length=500)
-    date = models.DateTimeField()
+    date = models.DateTimeField(default=datetime.datetime.now())
     category = models.CharField()
 
 class User(AbstractUser):
@@ -24,5 +24,6 @@ class Bid(models.Model):
 
 class Comment(models.Model):
     content = models.CharField(max_length=500)
+    date = models.DateTimeField(default=datetime.datetime.now())
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='comments')

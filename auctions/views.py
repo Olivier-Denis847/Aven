@@ -112,8 +112,8 @@ def create_form(request):
             category = CATEGORIES[int(form.cleaned_data['category'])]
 
             new_listing = Listing(
-                name = name, image = img, description = description,
-                category = category, date =  datetime.datetime.now())
+                name=name, image=img, description=description, category=category, 
+                date=datetime.datetime.now())
             new_listing.save()
             starting_bid = Bid(amount = price, user=request.user, listing=new_listing)
             starting_bid.save()
@@ -141,9 +141,10 @@ def listing_view(request, id):
         user.save()
 
     wishlist = False
-    in_user = user.wishlist.filter(id=id).count()
-    if in_user != 0:
-        wishlist = True
+    if user.is_authenticated:
+        in_user = user.wishlist.filter(id=id).count()
+        if in_user != 0:
+            wishlist = True
 
     bid_form = Add_bid()
     comment_form = Add_comment()
@@ -152,3 +153,38 @@ def listing_view(request, id):
         'wishlist':wishlist
     })
 
+@login_required
+def listing_bid(request, id):
+    user = request.user
+    listing = Listing.objects.get(id=id)
+    old_bid = listing.highest_bid
+    form = Add_bid(request.POST)
+    amount = float('-inf')
+    if form.is_valid(): 
+        amount = float(form.cleaned_data['amount'])
+
+    if amount > old_bid.amount:
+        old_bid.delete()
+        new_bid = Bid(amount=amount, user=user, listing=listing)
+        new_bid.save()
+        return HttpResponseRedirect(reverse('index'))
+    else:
+        comment_form = Add_comment()
+        wishlist = False
+        in_user = user.wishlist.filter(id=id).count()
+        if in_user != 0:
+            wishlist = True
+        return render(request, 'auctions/listing.html', {
+            'listing':listing, 'bid_form':Add_bid(), 'comment_form': comment_form, 
+        'wishlist':wishlist, 'msg': 'Bid is too low'
+        })
+
+def listing_comment(request, id):
+    listing = Listing.objects.get(id=id)
+    form = Add_comment(request.POST)
+    if form.is_valid():
+        content = form.cleaned_data['content']
+        comment = Comment(content=content, date=datetime.datetime.now(), 
+                          user=request.user, listing=listing)
+        comment.save()
+    return HttpResponseRedirect(reverse('listing_view', kwargs={'id':id}))

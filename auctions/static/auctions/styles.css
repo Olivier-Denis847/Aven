@@ -14,6 +14,9 @@ a td{
     margin-left: auto;
     margin-right: auto;
 }
+.lisitng tbody{
+    padding-left: 5%;
+}
 .half_list img{
     border: 1px solid lightgray;
     max-width: 100%;
@@ -37,4 +40,12 @@ a td{
     height: auto;
     display: block;
     margin: auto;
+}
+#on_wishlist{
+    width: 40%;
+    color: darkred;
+}
+#no_wishlist{
+    width: 40%;
+    color: darkblue;
 }

@@ -3,13 +3,15 @@
 {% block title%}{{listing.name}}{% endblock %}
 
 {% block body %}
+<h3>{{msg}}</h3>
 <table class="listing">
     <tr>
     <td class="listing_left_col">
         <h2>{{listing.name}}</h2>
     </td>
     <td>
-        <form action="{% url 'listing_view' id=listing.id %}" method="post">
+        {% if user.is_authenticated %}
+        <form action="{% url 'listing_view' id=listing.id %}" method="POST">
             {% csrf_token %}
             {% if wishlist %}
             <input id="on_wishlist" type="submit" name="wishlist" value="Remove from wishlist">
@@ -17,6 +19,9 @@
             <input id="no_wishlist" type="submit" name="wishlist" value="Add to wishlist">
             {% endif %}
         </form>
+        {% else %}
+        <strong>Sign in to add to wishlist</strong>
+        {% endif %}
     </td>
     </tr>
     <tr>
@@ -33,11 +38,46 @@
     </td></tr>
     <tr><td colspan="2">
         <p>{{listing.description}}</p>
+        <hr>
     </td></tr>
     <tr>
     <td colspan="2">
-        <p>${{listing.highest_bid.amount}}</p>
+        <h3>${{listing.highest_bid.amount}}</h3>
+        {% if user.is_authenticated %}
+            {% if listing.highest_bid.user == user %}
+                <h4>You have the highest bid</h4>
+            {% else %}
+            <form action="{% url 'add_bid' id=listing.id %}" method="POST">
+                {% csrf_token %}
+                {{bid_form}}
+                <input type="submit" value="Place bid">
+            </form>
+            {% endif %}
+        {% endif %}
     </td>
     </tr>
 </table>
+<br><hr>
+<h3>Add a comment</h3>
+<form action="{% url 'add_comment' id=listing.id%}", method="POST">
+    {% csrf_token %}
+    {{comment_form}}
+    <input type="submit" value="Post comment">
+</form>
+<br><hr>
+<h3>Comments</h3>
+
+{% for c in listing.comments.all %}
+    <table class="listing">
+        <tr><td>
+            <h4>{{c.user.username}}</h4>
+        </td></tr>
+        <tr><td>
+            <p>{{c.date}}</p>
+        </td></tr>
+        <tr><td>
+            <p>{{c.content}}</p>
+        </td></tr>
+    </table>
+{% endfor %}
 {% endblock %}
