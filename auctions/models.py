@@ -3,18 +3,21 @@ from django.db import models
 import datetime
 
 
+
+class User(AbstractUser):
+    username = models.CharField(max_length=100, unique=True, primary_key=True)
+    email = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+
 class Listing(models.Model):
     name = models.CharField(max_length=100)
     image = models.CharField()
     description = models.CharField(max_length=500)
     date = models.DateTimeField(default=datetime.datetime.now())
     category = models.CharField()
-
-class User(AbstractUser):
-    username = models.CharField(max_length=100, unique=True, primary_key=True)
-    email = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)
-    wishlist = models.ManyToManyField(Listing)
+    wishlist = models.ManyToManyField(User, related_name='wishlist')
+    poster = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    closed = models.BooleanField(default=False)
 
 class Bid(models.Model):
     amount = models.FloatField()

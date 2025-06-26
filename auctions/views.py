@@ -30,16 +30,16 @@ class Add_comment(forms.Form):
     
     
 def index(request):
-    items = Listing.objects.all()
+    items = Listing.objects.all().order_by('-id')
     return render(request, "auctions/index.html", {
-        'listings': items, 'empty': len(items)==0, 'home': True
+        'listings': items, 'empty': len(items)==0, 'from': 'home'
     })
 
 @login_required
 def wishlisted(request):
-    items = request.user.wishlist.all()
+    items = request.user.wishlist.all().order_by('-id')
     return render(request, "auctions/index.html", {
-        'listings': items, 'empty': len(items)==0, 'home': False
+        'listings': items, 'empty': len(items)==0, 'from': 'wishlist'
     })
 
 def login_view(request):
@@ -111,9 +111,8 @@ def create_form(request):
             price = form.cleaned_data['starting_bid']
             category = CATEGORIES[int(form.cleaned_data['category'])]
 
-            new_listing = Listing(
-                name=name, image=img, description=description, category=category, 
-                date=datetime.datetime.now())
+            new_listing = Listing(name=name, image=img, description=description, 
+                category=category, date=datetime.datetime.now(), poster=request.user)
             new_listing.save()
             starting_bid = Bid(amount = price, user=request.user, listing=new_listing)
             starting_bid.save()
@@ -127,6 +126,18 @@ def listing_view(request, id):
         item = Listing.objects.get(id = id)
     except ObjectDoesNotExist:
         return HttpResponseRedirect(reverse("index"))
+
+    if item.poster == user:
+        if request.method == 'POST':
+            close = request.POST.get('close_bid', False)
+            if close:
+                item.closed = True
+                item.save()
+        wishlisted = item.wishlist.all().count()
+        return render(request, 'auctions/listing.html',{
+            'listing':item, 'admin':True, 'comment_form':Add_comment(),
+            'wishlisted':wishlisted
+                })
     
     #3 different forms on the same view. Each has a different action 1 func for each
     #Add to wishlist
@@ -146,10 +157,8 @@ def listing_view(request, id):
         if in_user != 0:
             wishlist = True
 
-    bid_form = Add_bid()
-    comment_form = Add_comment()
     return render(request, 'auctions/listing.html',{
-        'listing':item, 'bid_form':bid_form, 'comment_form':comment_form, 
+        'listing':item, 'bid_form':Add_bid(), 'comment_form':Add_comment(), 
         'wishlist':wishlist
     })
 
@@ -169,6 +178,7 @@ def listing_bid(request, id):
         new_bid.save()
         return HttpResponseRedirect(reverse('index'))
     else:
+        #Duplicating code to pass in an error, probably not ideal
         comment_form = Add_comment()
         wishlist = False
         in_user = user.wishlist.filter(id=id).count()
@@ -188,3 +198,13 @@ def listing_comment(request, id):
                           user=request.user, listing=listing)
         comment.save()
     return HttpResponseRedirect(reverse('listing_view', kwargs={'id':id}))
+
+def category_list(request):
+    return render(request, 'auctions/category_list.html', {'categories': CATEGORIES})
+
+def category_view(request, category):
+    listings = Listing.objects.filter(category=category).order_by('-id')
+    return render(request, 'auctions/index.html', {
+        'listings':listings, 'empty':len(listings)==0, 'from': 'category', 
+        'category': category
+    })

@@ -12,5 +12,7 @@ urlpatterns = [
     path("listing/<str:id>", views.listing_view, name='listing_view'),
     path("wishlist", views.wishlisted, name='wishlist'),
     path('bid_redirect/<str:id>', views.listing_bid, name='add_bid'),
-    path('comment_redirect/<str:id>', views.listing_comment, name='add_comment')
+    path('comment_redirect/<str:id>', views.listing_comment, name='add_comment'),
+    path('category', views.category_list, name='category_list'),
+    path('category/<str:category>', views.category_view, name='category_view')
 ]
