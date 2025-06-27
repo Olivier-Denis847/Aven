@@ -6,7 +6,7 @@
 <h3>{{msg}}</h3>
 {% if listing.closed%}
 <h3 style="text-align: center;">Bid closed 
-    {% if listing.highest_bid.user == user %}
+    {% if listing.highest_bid.user == user and not admin%}
         You won!
     {% endif %}
 </h3>
@@ -46,17 +46,22 @@
         <img src="{{listing.image}}" id="listing_main">
     </td></tr>
     <tr><td colspan="2">
-        <p>{{listing.description}}</p>
+        <p class="small_content">{{listing.description}}</p>
         <hr>
     </td></tr>
     <tr>
-    <td colspan="2">
+    <td colspan="2" style="padding-left: 2.5%;">
         {% if admin %}
-        <p>Highest bid is: <strong>${{listing.highest_bid.amount}}</strong></p>
-        <form action="{% url 'listing_view' id=listing.id %}" method="POST">
-            {% csrf_token %}
-            <input type="submit" name="close_bid" value="Close bidding">
-        </form>
+            {% if listing.highest_bid.user == user %}
+                <p>There are no bids yet, starting bid is 
+                    <strong>${{listing.highest_bid.amount}}</strong></p>
+            {% else %}
+                <p>Highest bid is: <strong>${{listing.highest_bid.amount}}</strong></p>
+            {% endif %}
+            <form action="{% url 'listing_view' id=listing.id %}" method="POST">
+                {% csrf_token %}
+                <input type="submit" name="close_bid" value="Close bidding">
+            </form>
         {% else %}
             <h3>${{listing.highest_bid.amount}}</h3>
             {% if user.is_authenticated and not listing.closed%}
@@ -91,14 +96,11 @@
 
 {% for c in listing.comments.all %}
     <table class="listing">
-        <tr><td>
+        <tr><td style="padding-left: 2.5%;">
             <h4>{{c.user.username}}</h4>
-        </td></tr>
-        <tr><td>
             <p>{{c.date}}</p>
-        </td></tr>
         <tr><td>
-            <p>{{c.content}}</p>
+            <p class="small_content">{{c.content}}</p>
         </td></tr>
     </table>
 {% endfor %}

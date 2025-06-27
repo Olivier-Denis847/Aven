@@ -128,16 +128,7 @@ def listing_view(request, id):
         return HttpResponseRedirect(reverse("index"))
 
     if item.poster == user:
-        if request.method == 'POST':
-            close = request.POST.get('close_bid', False)
-            if close:
-                item.closed = True
-                item.save()
-        wishlisted = item.wishlist.all().count()
-        return render(request, 'auctions/listing.html',{
-            'listing':item, 'admin':True, 'comment_form':Add_comment(),
-            'wishlisted':wishlisted
-                })
+        return _listing_admin(request, item)
     
     #3 different forms on the same view. Each has a different action 1 func for each
     #Add to wishlist
@@ -161,6 +152,18 @@ def listing_view(request, id):
         'listing':item, 'bid_form':Add_bid(), 'comment_form':Add_comment(), 
         'wishlist':wishlist
     })
+
+def _listing_admin(request, item):
+    if request.method == 'POST':
+        close = request.POST.get('close_bid', False)
+        if close:
+            item.closed = True
+            item.save()
+    wishlisted = item.wishlist.all().count()
+    return render(request, 'auctions/listing.html',{
+        'listing':item, 'admin':True, 'comment_form':Add_comment(),
+        'wishlisted':wishlisted
+            })
 
 @login_required
 def listing_bid(request, id):
