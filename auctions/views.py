@@ -61,7 +61,7 @@ def login_view(request):
     else:
         return render(request, "auctions/login.html")
 
-
+@login_required
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
@@ -93,7 +93,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
-
+@login_required
 def creation_view(request):
     listing = Create_listing()
     return render(request, 'auctions/create.html', {
@@ -153,6 +153,7 @@ def listing_view(request, id):
         'wishlist':wishlist
     })
 
+@login_required
 def _listing_admin(request, item):
     if request.method == 'POST':
         close = request.POST.get('close_bid', False)
@@ -192,6 +193,7 @@ def listing_bid(request, id):
         'wishlist':wishlist, 'msg': 'Bid is too low'
         })
 
+@login_required
 def listing_comment(request, id):
     listing = Listing.objects.get(id=id)
     form = Add_comment(request.POST)

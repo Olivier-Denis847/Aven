@@ -58,10 +58,12 @@
             {% else %}
                 <p>Highest bid is: <strong>${{listing.highest_bid.amount}}</strong></p>
             {% endif %}
+            {% if not listing.closed%}
             <form action="{% url 'listing_view' id=listing.id %}" method="POST">
                 {% csrf_token %}
                 <input type="submit" name="close_bid" value="Close bidding">
             </form>
+            {% endif %}
         {% else %}
             <h3>${{listing.highest_bid.amount}}</h3>
             {% if user.is_authenticated and not listing.closed%}
